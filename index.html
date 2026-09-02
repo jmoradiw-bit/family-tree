@@ -1,5 +1,75 @@
-<!DOCTYPE html> <html lang="fa"> <head> <meta charset="UTF-8"> <title>شجره‌نامه مرادی</title> <link rel="stylesheet" href="style.css"> </head> <body> <header> <h1>شجره‌نامه مرادی</h1> <input id="searchInput" type="text" placeholder="جستجوی نام..."> <button id="searchBtn">جستجو</button> </header>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شجره‌نامه خانواده احمدی</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-<main> <div id="treeContainer"></div> </main>
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 48 48" width="30" height="30">
+        <path d="M24 4 L24 44 M24 14 L12 24 M24 14 L36 24 M24 26 L14 40 M24 26 L34 40" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="24" cy="8" r="4" fill="currentColor"/>
+        <circle cx="12" cy="24" r="3.4" fill="currentColor"/>
+        <circle cx="36" cy="24" r="3.4" fill="currentColor"/>
+        <circle cx="14" cy="40" r="3.4" fill="currentColor"/>
+        <circle cx="34" cy="40" r="3.4" fill="currentColor"/>
+      </svg>
+    </span>
+    <div class="brand-text">
+      <h1>شجره‌نامه خانواده احمدی</h1>
+      <p>نسل به نسل، از ریشه تا امروز</p>
+    </div>
+  </div>
 
-<script src="script.js"></script> </body> </html>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/>
+        <line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input type="text" id="searchInput" placeholder="جستجوی نام..." autocomplete="off">
+      <div id="searchResults" class="search-results" hidden></div>
+    </div>
+    <div class="view-actions">
+      <button id="expandAllBtn" class="ghost-btn" type="button">باز کردن همه</button>
+      <button id="collapseAllBtn" class="ghost-btn" type="button">بستن همه</button>
+      <button id="zoomOutBtn" class="ghost-btn icon-btn" type="button" aria-label="کوچک‌نمایی">−</button>
+      <span id="zoomLabel" class="zoom-label">100%</span>
+      <button id="zoomInBtn" class="ghost-btn icon-btn" type="button" aria-label="بزرگ‌نمایی">+</button>
+      <button id="resetViewBtn" class="ghost-btn" type="button">بازنشانی نما</button>
+    </div>
+  </div>
+</header>
+
+<main class="tree-viewport" id="treeViewport">
+  <div class="tree-canvas" id="treeCanvas">
+    <div class="tree-root" id="treeRoot"></div>
+  </div>
+</main>
+
+<div class="legend" id="legend"></div>
+
+<div class="person-modal" id="personModal" hidden>
+  <div class="person-modal-backdrop" id="personModalBackdrop"></div>
+  <div class="person-modal-card" role="dialog" aria-modal="true">
+    <button class="person-modal-close" id="personModalClose" aria-label="بستن">×</button>
+    <div id="personModalBody"></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>برای افزودن، ویرایش یا حذف افراد فعلاً فایل <code>data.js</code> را ویرایش کنید. بخش مدیریت تصویری در آینده اضافه می‌شود.</p>
+</footer>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
