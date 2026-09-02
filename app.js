@@ -1,13 +1,26 @@
 const people=new Map(FAMILY_TREE.people.map(p=>[p.id,p]));
 const unions=FAMILY_TREE.unions;
 const byId=id=>people.get(id);
-function full(p){return `${p.name} ${p.last}`.trim()}
+function full(p){return `${p.name} ${p.last||''}`.trim()}
 function parentText(p){const f=p.father?full(byId(p.father)):'';const m=p.mother?full(byId(p.mother)):'';return [f&&`پدر: ${f}`,m&&`مادر: ${m}`].filter(Boolean).join(' | ')||'والدین ثبت نشده';}
-function card(id){const p=byId(id);const el=document.createElement('div');el.className=`person ${p.gender}`;el.dataset.id=id;el.innerHTML=`${p.photo?`<img class="photo" src="${p.photo}">`:''}<div class="name">${full(p)}</div><div class="meta">${p.birth?`تولد: ${p.birth}`:''}</div><div class="meta">${parentText(p)}</div>`;el.onclick=()=>selectPerson(id,true);return el}
+function card(id){const p=byId(id);const el=document.createElement('div');el.className=`person ${p.gender}`;el.dataset.id=id;el.innerHTML=`${p.photo?`<img class="photo" src="${p.photo}">`:''}<div class="name">${full(p)}</div><div class="meta">${p.birth?`تولد: ${p.birth}`:''}</div><div class="meta">${p.relation||parentText(p)}</div>`;el.onclick=()=>selectPerson(id,true);return el}
 function buildTree(){const root=document.getElementById('tree');root.innerHTML='';root.appendChild(renderFamily(FAMILY_TREE.rootId,new Set()));}
 function renderFamily(id,seen){if(seen.has(id))return document.createTextNode('');seen.add(id);const box=document.createElement('div');box.className='family';const p=byId(id);const rel=unions.filter(u=>u.a===id||u.b===id);if(!rel.length){box.appendChild(card(id));return box}rel.forEach(u=>{const row=document.createElement('div');row.className='family';const couple=document.createElement('div');couple.className='couple';couple.appendChild(card(u.a));const plus=document.createElement('span');plus.className='plus';plus.textContent='♥';couple.appendChild(plus);couple.appendChild(card(u.b));const label=document.createElement('div');label.className='union-label';label.textContent=u.label||'خانواده';row.append(couple,label);if(u.children?.length){const children=document.createElement('div');children.className='children';u.children.forEach(cid=>{const ch=document.createElement('div');ch.className='child';ch.appendChild(renderFamily(cid,new Set(seen)));children.appendChild(ch)});row.appendChild(children)}box.appendChild(row)});return box}
 function search(q){q=q.trim().toLowerCase();const results=document.getElementById('results');results.innerHTML='';if(!q){document.getElementById('count').textContent='';return}const tokens=q.split(/\s+/).filter(Boolean);const arr=FAMILY_TREE.people.filter(p=>tokens.every(t=>[full(p),p.name,p.last,p.father&&full(byId(p.father)),p.mother&&full(byId(p.mother))].filter(Boolean).some(v=>v.toLowerCase().includes(t))));document.getElementById('count').textContent=`${arr.length} نفر پیدا شد`;arr.forEach(p=>{const b=document.createElement('button');b.className='result';b.innerHTML=`${full(p)}<small>${parentText(p)}</small>`;b.onclick=()=>{selectPerson(p.id,true);results.innerHTML='';document.getElementById('count').textContent='';document.getElementById('q').value=full(p)};results.appendChild(b)})}
 function ancestors(id){const set=new Set();function walk(x){if(!x||set.has(x))return;set.add(x);const p=byId(x);walk(p.father);walk(p.mother)}walk(id);return set}
 function selectPerson(id,scroll){document.querySelectorAll('.person').forEach(e=>e.classList.remove('selected','highlight'));const path=ancestors(id);path.forEach(x=>document.querySelectorAll(`.person[data-id="${CSS.escape(x)}"]`).forEach(e=>e.classList.add('highlight')));document.querySelectorAll(`.person[data-id="${CSS.escape(id)}"]`).forEach(e=>{e.classList.add('selected');if(scroll)e.scrollIntoView({behavior:'smooth',block:'center',inline:'center'})});openModal(id)}
 function openModal(id){const p=byId(id);document.getElementById('modalBody').innerHTML=`<h2>${full(p)}</h2><p>${p.birth?`تولد: ${p.birth}`:'تاریخ تولد ثبت نشده'}</p><p>${parentText(p)}</p><p class="path-note">مسیر اجدادی این فرد با رنگ کرمی-طلایی مشخص شده است.</p>`;document.getElementById('modal').classList.remove('hidden')}
-document.getElementById('q').oninput=e=>search(e.target.value);document.getElementById('clear').onclick=()=>{document.getElementById('q').value='';document.getElementById('results').innerHTML='';document.getElementById('count').textContent='';document.querySelectorAll('.person').forEach(e=>e.classList.remove('selected','highlight'))};document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.add('hidden');document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')e.currentTarget.classList.add('hidden')};buildTree();
+function renderPeopleList(){
+  const box=document.getElementById('peopleList');
+  if(!box)return;
+  box.innerHTML='';
+  FAMILY_TREE.people.forEach(p=>{
+    const b=document.createElement('button');
+    b.className=`person-row ${p.gender}`;
+    b.innerHTML=`<span class="row-name">${full(p)}</span><span class="row-rel">${p.relation||''}</span>`;
+    b.onclick=()=>{selectPerson(p.id,true); document.getElementById('q').value=full(p); document.getElementById('peopleList').scrollIntoView({behavior:'smooth',block:'center'});};
+    box.appendChild(b);
+  });
+  document.getElementById('peopleCount').textContent=`(${FAMILY_TREE.people.length} نفر)`;
+}
+document.getElementById('q').oninput=e=>search(e.target.value);document.getElementById('clear').onclick=()=>{document.getElementById('q').value='';document.getElementById('results').innerHTML='';document.getElementById('count').textContent='';document.querySelectorAll('.person').forEach(e=>e.classList.remove('selected','highlight'))};document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.add('hidden');document.getElementById('modal').onclick=e=>{if(e.target.id==='modal')e.currentTarget.classList.add('hidden')};buildTree();renderPeopleList();
